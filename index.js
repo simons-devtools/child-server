@@ -26,6 +26,8 @@ client.connect(err => {
     console.log('Mongodb services database is ready');
     const reviewsCollection = client.db(`${process.env.DB_REVIEWS}`).collection(`${process.env.DB_REVIEW}`);
     console.log('Mongodb reviews database is ready');
+    const ordersCollection = client.db(`${process.env.DB_ORDERS}`).collection(`${process.env.DB_ORDER}`);
+    console.log('Mongodb orders database is ready');
 
     // POST data/services to mongodb cloud:
     app.post('/addServices', (req, res) => {
@@ -40,11 +42,12 @@ client.connect(err => {
     // GET all services from MDB cloud:
     app.get('/services', (req, res) => {
         servicesCollection.find({})
-            .toArray((err, products) => {
-                res.send(products)
+            .toArray((err, services) => {
+                res.send(services)
             })
     })
 
+    // -----------------------------------------------------
     // Post users reviews to MDB cloud:
     app.post('/addReviews', (req, res) => {
         const newReview = req.body;
@@ -52,6 +55,25 @@ client.connect(err => {
             .then(result => {
                 // console.log('Result=', result);
                 res.send(result.insertedCount > 0)
+            })
+    })
+
+    // GET users reviews from MDB cloud:
+    app.get('/reviews', (req, res) => {
+        reviewsCollection.find({})
+            .toArray((err, reviews) => {
+                res.send(reviews)
+            })
+    })
+
+    // -----------------------------------------------------
+    // Post order to the MDB cloud:
+    app.post('/addOrder', (req, res) => {
+        const newOrder = req.body;
+        ordersCollection.insertOne(newOrder)
+            .then(result => {
+                console.log(result);
+                res.send(result.insertedCount > 0);
             })
     })
 
